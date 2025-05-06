@@ -1,0 +1,45 @@
+# .github/workflows/tests.yml
+name: Run Tests and Generate Coverage Report
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v4 # Используем актуальную версию action
+
+    # 2. Set up Python
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5 # Используем актуальную версию action
+      with:
+        python-version: "3.10"
+        cache: 'pip' # Добавляем кэширование зависимостей
+
+    # 3. Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest coverage
+
+    # 4. Run tests with coverage
+    - name: Run tests with coverage
+      run: |
+        coverage run --source=. -m pytest  # Запуск тестов с покрытием
+        coverage report -m               # Вывод отчета покрытия в лог
+
+    # - name: Upload coverage report
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: coverage-report
+    #     path: .coverage
